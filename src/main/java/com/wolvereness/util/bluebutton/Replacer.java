@@ -161,6 +161,7 @@ public class Replacer implements Comparable<Replacer> {
 		this.handler = handler;
 	}
 
+	@Override
 	public int compareTo(final Replacer that) {
 		if (this.header != that.header)
 			throw new IllegalArgumentException("Cannot compare " + this + " and " + that);
