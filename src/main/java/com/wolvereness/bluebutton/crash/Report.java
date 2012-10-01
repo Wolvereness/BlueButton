@@ -7,11 +7,15 @@ import static com.wolvereness.bluebutton.crash.Tokens.STACK_MORE_END;
 import static com.wolvereness.bluebutton.crash.Tokens.STACK_MORE_START;
 import static com.wolvereness.bluebutton.crash.Tokens.STACK_START;
 import static com.wolvereness.bluebutton.crash.Tokens.START;
+import static com.wolvereness.bluebutton.crash.Tokens.TIME_START;
 import static com.wolvereness.bluebutton.crash.Tokens.WORLD;
 import static com.wolvereness.bluebutton.crash.Tokens.WORLD_START;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,128 +23,337 @@ import java.util.ListIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.wolvereness.util.bluebutton.Splitter;
+import com.wolvereness.util.bluebutton.StringMaker;
 
-class ExceptionMessage implements Serializable {
+class ExceptionMessage implements Serializable, StringMaker.Appendable {
 	private static final long serialVersionUID = -8052119166635775588L;
+	private static final String[] TYPES = new String[] { "type", "message", "stack"};
 
 	final String exceptionType;
 	final String message;
 	final List<StackTraceElement> stacks;
+
 	ExceptionMessage(final List<String> description, final List<StackTraceElement> stacks) {
 		this.stacks = ImmutableList.copyOf(stacks);
 		final Iterator<String> it = description.iterator();
 		final String exception = it.next();
 		final int colon = exception.indexOf(':');
-		this.exceptionType = exception.substring(0, colon);
-		final StringBuilder message = new StringBuilder(exception.substring(colon + 2));
-		while(it.hasNext()) {
-			message.append('\n').append(it.next());
+		if (colon != -1) {
+			this.exceptionType = exception.substring(0, colon);
+			final StringBuilder message = new StringBuilder(exception.substring(colon + 2));
+			while(it.hasNext()) {
+				message.append('\n').append(it.next());
+			}
+			this.message = message.toString();
+		} else {
+			this.exceptionType = exception;
+			this.message = "";
 		}
-		this.message = message.toString();
+	}
+
+	@Override
+	public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+		return StringMaker.appendTo(
+			TYPES,
+			new Object[] {
+				exceptionType,
+				message,
+				stacks
+				},
+			builder.append(ExceptionMessage.class.getName()),
+			indent);
 	}
 
 	List<StackTraceElement> getStackTrace() {
 		return stacks;
 	}
 
+	@Override
+	public String toString() {
+		return appendTo(new StringBuilder(), 1).toString();
+	}
+
 }
 
-class Node {
+class Node implements Serializable, StringMaker.Appendable {
+	private static final long serialVersionUID = -7456417988332538402L;
+	private static final String[] TYPES = new String[] {"type"};
+
+	private final Nodes type;
+
+	Node(final Nodes type) {
+		this.type = type;
+	}
+
+	@Override
+	public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+		return StringMaker.appendTo(
+			TYPES,
+			new Object[] {
+				type
+				},
+			builder.append(Node.class.getName()),
+			indent);
+	}
+
+	@Override
+	public String toString() {
+		return appendTo(new StringBuilder(), 1).toString();
+	}
 
 }
+//return StringMaker.appendTo(\n\t\t\t\t\t\tTYPES,\n\t\t\t\t\t\tnew Object[] {\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\tsuper.appendTo(builder, indent).append('.').append(getClass().getName()),\n\t\t\t\t\t\tindent);
 
-enum Nodes {
+enum Nodes implements Serializable {
 	_NA {
 		@Override public Node makeNode(final String line, final List<String> data) {
-			return new Node() {
+			return new Node(this) {
+				private static final long serialVersionUID = 1806744531754775486L;
 				// TODO Auto-generated method stub
+				private final String[] TYPES = new String[] {};
+
+				@Override public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+					// TODO Auto-generated method stub
+					return StringMaker.appendTo(
+						TYPES,
+						new Object[] {
+							},
+						super.appendTo(builder, indent).append(getClass().getName()),
+						indent);
+				}
 			};
 		}
 	},
 	CRAFTBUKKIT_INFORMATION {
 		@Override public Node makeNode(final String line, final List<String> data) {
-			return new Node() {
+			return new Node(this) {
+				private static final long serialVersionUID = -1238140494055183276L;
 				// TODO Auto-generated method stub
+				private final String[] TYPES = new String[] {};
+
+				@Override public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+					// TODO Auto-generated method stub
+					return StringMaker.appendTo(
+						TYPES,
+						new Object[] {
+							},
+						super.appendTo(builder, indent).append(getClass().getName()),
+						indent);
+				}
 			};
 		}
 	},
 	IS_MODDED {
 		@Override public Node makeNode(final String line, final List<String> data) {
-			return new Node() {
+			return new Node(this) {
+				private static final long serialVersionUID = -2978008995834097857L;
 				// TODO Auto-generated method stub
+				private final String[] TYPES = new String[] {};
+
+				@Override public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+					// TODO Auto-generated method stub
+					return StringMaker.appendTo(
+						TYPES,
+						new Object[] {
+							},
+						super.appendTo(builder, indent).append(getClass().getName()),
+						indent);
+				}
 			};
 		}
 	},
 	JAVA_VERSION {
 		@Override public Node makeNode(final String line, final List<String> data) {
-			return new Node() {
+			return new Node(this) {
+				private static final long serialVersionUID = 6469440502730283729L;
 				// TODO Auto-generated method stub
+				private final String[] TYPES = new String[] {};
+
+				@Override public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+					// TODO Auto-generated method stub
+					return StringMaker.appendTo(
+						TYPES,
+						new Object[] {
+							},
+						super.appendTo(builder, indent).append(getClass().getName()),
+						indent);
+				}
 			};
 		}
 	},
 	JAVA_VM_VERSION {
 		@Override public Node makeNode(final String line, final List<String> data) {
-			return new Node() {
+			return new Node(this) {
+				private static final long serialVersionUID = -3031947030091611359L;
 				// TODO Auto-generated method stub
+				private final String[] TYPES = new String[] {};
+
+				@Override public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+					// TODO Auto-generated method stub
+					return StringMaker.appendTo(
+						TYPES,
+						new Object[] {
+							},
+						super.appendTo(builder, indent).append(getClass().getName()),
+						indent);
+				}
 			};
 		}
 	},
 	JVM_FLAGS {
 		@Override public Node makeNode(final String line, final List<String> data) {
-			return new Node() {
+			return new Node(this) {
+				private static final long serialVersionUID = -7789346901121607201L;
 				// TODO Auto-generated method stub
+				private final String[] TYPES = new String[] {};
+
+				@Override public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+					// TODO Auto-generated method stub
+					return StringMaker.appendTo(
+						TYPES,
+						new Object[] {
+							},
+						super.appendTo(builder, indent).append(getClass().getName()),
+						indent);
+				}
 			};
 		}
 	},
 	MEMORY {
 		@Override public Node makeNode(final String line, final List<String> data) {
-			return new Node() {
+			return new Node(this) {
+				private static final long serialVersionUID = -5483966477648362518L;
 				// TODO Auto-generated method stub
+				private final String[] TYPES = new String[] {};
+
+				@Override public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+					// TODO Auto-generated method stub
+					return StringMaker.appendTo(
+						TYPES,
+						new Object[] {
+							},
+						super.appendTo(builder, indent).append(getClass().getName()),
+						indent);
+				}
 			};
 		}
 	},
 	MINECRAFT_VERSION {
 		@Override public Node makeNode(final String line, final List<String> data) {
-			return new Node() {
+			return new Node(this) {
+				private static final long serialVersionUID = 6272160377152734479L;
 				// TODO Auto-generated method stub
+				private final String[] TYPES = new String[] {};
+
+				@Override public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+					// TODO Auto-generated method stub
+					return StringMaker.appendTo(
+						TYPES,
+						new Object[] {
+							},
+						super.appendTo(builder, indent).append(getClass().getName()),
+						indent);
+				}
 			};
 		}
 	},
 	OPERATING_SYSTEM {
 		@Override public Node makeNode(final String line, final List<String> data) {
-			return new Node() {
+			return new Node(this) {
+				private static final long serialVersionUID = -3913076311178282768L;
 				// TODO Auto-generated method stub
+				private final String[] TYPES = new String[] {};
+
+				@Override public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+					// TODO Auto-generated method stub
+					return StringMaker.appendTo(
+						TYPES,
+						new Object[] {
+							},
+						super.appendTo(builder, indent).append(getClass().getName()),
+						indent);
+				}
 			};
 		}
 	},
 	PLAYER_COUNT {
 		@Override public Node makeNode(final String line, final List<String> data) {
-			return new Node() {
+			return new Node(this) {
+				private static final long serialVersionUID = -2655651225284524999L;
 				// TODO Auto-generated method stub
+				private final String[] TYPES = new String[] {};
+
+				@Override public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+					// TODO Auto-generated method stub
+					return StringMaker.appendTo(
+						TYPES,
+						new Object[] {
+							},
+						super.appendTo(builder, indent).append(getClass().getName()),
+						indent);
+				}
 			};
 		}
 	},
 	PROFILER_POSITION {
 		@Override public Node makeNode(final String line, final List<String> data) {
-			return new Node() {
+			return new Node(this) {
+				private static final long serialVersionUID = 5133277576735422736L;
 				// TODO Auto-generated method stub
+				private final String[] TYPES = new String[] {};
+
+				@Override public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+					// TODO Auto-generated method stub
+					return StringMaker.appendTo(
+						TYPES,
+						new Object[] {
+							},
+						super.appendTo(builder, indent).append(getClass().getName()),
+						indent);
+				}
 			};
 		}
 	},
 	TYPE {
 		@Override public Node makeNode(final String line, final List<String> data) {
-			return new Node() {
+			return new Node(this) {
+				private static final long serialVersionUID = 8823694713117783921L;
 				// TODO Auto-generated method stub
+				private final String[] TYPES = new String[] {};
+
+				@Override public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+					// TODO Auto-generated method stub
+					return StringMaker.appendTo(
+						TYPES,
+						new Object[] {
+							},
+						super.appendTo(builder, indent).append(getClass().getName()),
+						indent);
+				}
 			};
 		}
 	},
 	WORLD {
 		@Override public Node makeNode(final String line, final List<String> data) {
-			return new Node() {
+			return new Node(this) {
+				private static final long serialVersionUID = -2700511998935256883L;
 				// TODO Auto-generated method stub
+				private final String[] TYPES = new String[] {};
+
+				@Override public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+					// TODO Auto-generated method stub
+					return StringMaker.appendTo(
+						TYPES,
+						new Object[] {
+							},
+						super.appendTo(builder, indent).append(getClass().getName()),
+						indent);
+				}
 			};
 		}
 	};
@@ -168,21 +381,25 @@ enum Nodes {
  * @author Wolfe
  */
 @SuppressWarnings("javadoc")
-public class Report {
-	private static final Pattern STACK_ELEMENT = Pattern.compile("^(\\tat )(([a-zA-Z]+\\.)+[A-Za-z]+)\\.([A-Za-z]+)\\((.*):(\\d+)\\)$");
+public class Report implements Serializable, StringMaker.Appendable {
+	private static final long serialVersionUID = 3476171284348297887L;
+	private static final Pattern STACK_ELEMENT = Pattern.compile("^(\\tat )(([a-zA-Z_\\$]+\\.)+[A-Za-z_\\$]+)\\.([A-Za-z_\\$<>]+)\\(((.*):(\\d+)|Unknown Source)\\)$");
+	private static final String[] TYPES = new String[] {"description","fun","nodes","exceptions","time",};
 
 	static StackTraceElement toStackTraceElement(final String element) {
 		final Matcher matcher = STACK_ELEMENT.matcher(element);
 		if (!matcher.matches())
 			throw new IllegalArgumentException("Invalid stack trace element: " + element);
-		try {
-			return new StackTraceElement(matcher.group(2), matcher.group(4), matcher.group(5), Integer.parseInt(matcher.group(6)));
-		} catch (final NumberFormatException ex) {
-			throw new IllegalArgumentException("Invalid stack trace element: " + element, ex);
-		}
+		if (matcher.group(6) == null) return new StackTraceElement(matcher.group(2), matcher.group(4), null, -2);
+		else
+			return new StackTraceElement(matcher.group(2), matcher.group(4), matcher.group(6), Integer.parseInt(matcher.group(7)));
 	}
 
+	final String description;
+	final ImmutableList<ExceptionMessage> exceptions;
+	final String fun;
 	final ImmutableMap<Nodes, Node> nodes;
+	final Date time;
 
 	public Report(final String text) {
 		final ArrayList<String> lines;
@@ -271,9 +488,11 @@ public class Report {
 					stacks.clear();
 				} else if (entry.startsWith(CAUSED_START)) {
 					// Finish old exception
-					exceptions.add(new ExceptionMessage(description, stacks));
-					description.clear();
-					stacks.clear();
+					if (description.size() != 0) {
+						exceptions.add(new ExceptionMessage(description, stacks));
+						description.clear();
+						stacks.clear();
+					}
 
 					// New exception
 					description.add(entry.substring(CAUSED_START.length()));
@@ -283,15 +502,56 @@ public class Report {
 				}
 			}
 			description.remove(description.size() - 1); // NOTE_0- There will be a blank line here, see NOTE_0- above
-			exceptions.add(new ExceptionMessage(description, stacks));
+			if (description.size() != 0) {
+				exceptions.add(new ExceptionMessage(description, stacks));
+			}
+
+			this.exceptions = ImmutableList.copyOf(exceptions);
 		} // _STACK_
 
 		while (!it.previous().startsWith(DESCRIPTION_START)) {} // This puts us on the line before the "description:"
+		it.next(); // Push iterator for description_start to hit twice
 
-		// TODO: add description
-		// TODO: add timestamp
-		// TODO: add joke
+		this.description = it.previous().substring(DESCRIPTION_START.length());
+
+		{ // _TIMESTAMP_
+			final String timeStamp = it.previous().substring(TIME_START.length());
+			Date time = null;
+			try {
+				time = (Date) DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.parseObject(timeStamp);
+			} catch (final ParseException ex) {
+				try {
+					time = new SimpleDateFormat().parse(timeStamp);
+				} catch (final ParseException e) {
+				}
+			}
+			this.time = time == null ? new Date(0l) : time;
+		} // _TIMESTAMP_
+
+		it.previous(); // Blank line after joke
+		this.fun = it.previous();
 
 		this.nodes = nodes.build();
+	}
+
+	@Override
+	public StringBuilder appendTo(final StringBuilder builder, final int indent) {
+		builder.append(Report.class.getName());
+		return StringMaker.appendTo(
+			TYPES,
+			new Object[] {
+				description,
+				fun,
+				nodes,
+				exceptions,
+				DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(time),
+				},
+			builder,
+			indent);
+	}
+
+	@Override
+	public String toString() {
+		return appendTo(new StringBuilder(), 1).toString();
 	}
 }

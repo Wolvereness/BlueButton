@@ -27,6 +27,7 @@ class Tokens {
 	public static final String STACK_MORE_START;
 	public static final String STACK_START;
 	public static final String START;
+	public static final String TIME_START;
 	public static final String WORLD;
 	public static final String WORLD_START;
 
@@ -40,5 +41,6 @@ class Tokens {
 		STACK_MORE_END = " more";
 		CAUSED_START = "Caused by: ";
 		DESCRIPTION_START = "Description: ";
+		TIME_START = "Time: ";
 	}
 }
